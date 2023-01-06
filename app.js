@@ -17,27 +17,37 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 wss.on('connection',  function connection(ws) {
+
   ws.sala = "";
   ws.id = "";
   let recipiente = "";
 
-  ws.on('open', function(data) {
-    let datos = data.toString();
-    let vectorDatos = datos.split("*^*")
-    ws.sala = vectorDatos[0];
-    ws.id = vectorDatos[1];
-  })
-
   ws.on('message', function(message) {
     let mensaje = message.toString();
-    if (mensaje[0] == "-") {
+    if (mensaje[0] == "*") {
+
+      let datos = mensaje.slice(1, mensaje.length);
+      let vectorDatos = datos.split("*^*")
+      ws.sala = vectorDatos[0];
+      ws.id = vectorDatos[1];
+
+    } else if (mensaje[0] == "-") {
+
       if (mensaje.length > 1) {
         recipiente = mensaje.slice(1, mensaje.length);
       }
+
     } else if (mensaje[0] == "+") {
+
       mensaje = mensaje.slice(1, mensaje.length);
       wss.broadcast(ws.id, ws.sala, mensaje, recipiente);
       recipiente = "";
+
+    } else if (mensaje[0] == "~") {
+
+      mensaje = mensaje.slice(1, mensaje.length);
+      wss.broadcast("Servidor", ws.sala, mensaje, "");
+
     }
   });
 });

@@ -3,9 +3,35 @@
   <head>
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script type="text/javascript" src="/javascripts/funciones.js"></script>
   </head>
   <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+
+    <h1>Chat</h1>
+    <label>Ingrese su nombre de usuario: </label>
+    <input type="text" id="nombre">
+    <br>
+    <br>
+    <label>Digite el código de la sala: </label>
+    <input type="text" id="sala">
+    <br>
+    <br>
+    <input type="button" value="Entrar" onclick="inicializar()">
+    <br>
+    <br>
+    <textarea id="chat" readonly></textarea>
+    <br>
+    <br>
+    <label>Objetivo: </label>
+    <input type="text" id="objetivo">
+    <br>
+    <br>
+    <label>Mensaje: </label>
+    <input type="text" id="mensaje">
+    <br>
+    <br>
+    <input type="button" value="Enviar" id="boton" disabled>
+    
+
   </body>
 </html>
