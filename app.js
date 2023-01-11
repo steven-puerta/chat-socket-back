@@ -4,11 +4,15 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var http = require('http');
+var cors = require('cors');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
+//
+app.use(cors());
+//
 
 //
 var WebSocket = require("ws");
@@ -88,6 +92,68 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+
+//--
+
+app.get('/crear-sala', function(req, res) {
+  console.log("Generando código...");
+  let codigo = crearSala();
+  let existe = buscarSala(codigo);
+
+  while (existe) {
+    console.log("El código ya existe, volviendo a generar...");
+    codigo = crearSala();
+    existe = buscarSala(codigo);
+  }
+
+  console.log("Codigo generado: " + codigo);
+  res.json({ exito: true, codigo: codigo});
+});
+
+function crearSala () {
+  let codigo = "";
+  let letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  
+  for (let i = 0; i < 6; i++) {
+    if (i < 3) {
+      let numero = Math.floor(Math.random() * 10);
+      codigo = codigo + numero;
+    } else {
+      let letra = letras[Math.floor(Math.random() * letras.length)];
+      codigo = codigo + letra;
+    }
+  }
+
+  return codigo;
+}
+
+function buscarSala (codigo) {
+
+  let existe = false;
+
+  wss.clients.forEach(function each(client) {
+    if (codigo == client.sala) {
+      existe = true;
+    }
+  })
+
+  return existe;
+}
+
+app.post('/buscar-sala', function(req, res) {
+  let codigo = req.body.codigo;
+  console.log("Buscando la sala con el código: " + codigo);
+  let existe = buscarSala(codigo);
+
+  if (existe) {
+    res.json({exito: true});
+  } else {
+    res.json({exito: false});
+  }
+})
+
+
+//--
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
